@@ -607,6 +607,7 @@ let _miniFlipAssets = false; // theme's mini assets drawn in reverse direction
 let _hasRoamVisual = false;  // theme binds a dedicated roam visual (≠ idle)
 let _roamFlipAssets = false; // theme's roam visual is drawn facing left, not right
 let _roamHeadingLeft = false; // current walk direction; roam visuals are drawn facing right
+let _assetDirectionFlipped = false; // local: mirrors #pet-asset-direction-stage, read by accessoryTransform()
 let _rightSideMirrorFiles = []; // idle animations mirrored while the pet sits on the right half
 let _petOnRightSide = false;
 let _inMiniMode = false;
@@ -693,6 +694,8 @@ function applyMiniFlip(el, state = currentState) {
   const activeFlip = shouldApplyMiniAssetFlip(state);
   if (el) el.__clawdAssetDirectionFlip = activeFlip;
   assetDirectionStage.style.scale = activeFlip ? "-1 1" : "none";
+  _assetDirectionFlipped = activeFlip;
+  refreshAccessoryFacing();
   reportAccessoryMirror(petAccessoryMirror.isAccessoryMirrored(state, miniFlipContext()));
 
   // A media crossfade can leave older children alive after the shared stage
@@ -1115,19 +1118,40 @@ function computeFollowAccessoryLayout(context) {
   });
 }
 
+// Local customization (cat head accessory): the cat keeps its idle facing while
+// the asset-direction stage is mirrored (leftward roam, right-side idle mirror).
+// cat.svg is drawn on a canvas symmetric about the head centre, so flipping the
+// image around its own centre restores the unmirrored look in place. The left
+// mini edge mirrors the whole pet through #pet-facing-stage and is not countered.
+function accessoryTransform(slot, layout) {
+  const m = layout.matrix;
+  const base = `matrix(${m.a}, ${m.b}, ${m.c}, ${m.d}, ${m.e}, ${m.f})`;
+  const keepFacing = _assetDirectionFlipped && !!slot.payload && /^cat(-|$)/.test(slot.payload.id);
+  return keepFacing ? `${base} translate(${layout.width}px, 0) scale(-1, 1)` : base;
+}
+
+function refreshAccessoryFacing() {
+  const slot = getAccessorySlot("head");
+  if (!slot || !slot.element || !slot.lastLayout) return;
+  const transform = accessoryTransform(slot, slot.lastLayout);
+  if (transform === slot.lastTransform) return;
+  slot.element.style.transform = transform;
+  slot.lastTransform = transform;
+}
+
 function applyAccessoryLayout(context, layout) {
   const slot = context && context.slot;
   if (!slot || !slot.element || !slot.assetReady || !layout) return false;
   const unchanged = accessoryLayout
     && typeof accessoryLayout.layoutsEqual === "function"
     && accessoryLayout.layoutsEqual(slot.lastLayout, layout);
-  if (!unchanged) {
-    const matrix = layout.matrix;
+  const transform = accessoryTransform(slot, layout);
+  if (!unchanged || slot.lastTransform !== transform) {
     slot.element.style.width = `${layout.width}px`;
     slot.element.style.height = `${layout.height}px`;
-    slot.element.style.transform =
-      `matrix(${matrix.a}, ${matrix.b}, ${matrix.c}, ${matrix.d}, ${matrix.e}, ${matrix.f})`;
+    slot.element.style.transform = transform;
     slot.lastLayout = layout;
+    slot.lastTransform = transform;
   }
   slot.element.style.filter = "none";
   // hideAccessory() pauses object-backed assets. Restore this document to the

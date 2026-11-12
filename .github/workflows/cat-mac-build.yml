@@ -1,0 +1,56 @@
+# Fork only: builds the macOS installers from the cat-accessories branch and
+# publishes them as a release. Ad-hoc signed, same as upstream's manual
+# validation build. The release is created with the workflow token, so it does
+# not trigger the upstream `release` workflows (winget, APT).
+name: Cat build (macOS)
+
+on:
+  push:
+    branches: [cat-accessories]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-mac:
+    runs-on: macos-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - run: npm ci
+      - run: npx electron-builder --mac dmg:arm64 dmg:x64 --publish never
+      - name: Publish the installers as a release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cat > notes.md <<'EOF'
+          맥용 Clawd on Desk에 머리 위 고양이 액세서리(삼색·검정·흰·흑백·치즈)를 더한 비공식 빌드입니다.
+
+          ## 설치
+
+          1. 아래 Assets에서 맥에 맞는 파일을 받습니다. M1 이후 맥은 `arm64`, 인텔 맥은 `x64`입니다.
+          2. 받은 dmg를 열고 앱을 응용 프로그램 폴더로 끌어다 놓습니다.
+          3. 처음 실행하면 macOS가 막습니다. 시스템 설정 > 개인정보 보호 및 보안 맨 아래에서 "그래도 열기"를 누릅니다.
+          4. "손상되었기 때문에 열 수 없습니다"라고 나오면 터미널에서 아래 명령을 한 번 실행한 뒤 다시 엽니다.
+
+             ```
+             xattr -cr "/Applications/Clawd on Desk.app"
+             ```
+
+          ## 고양이 켜기
+
+          펫을 우클릭해 "설정…"을 열고, "머리 액세서리"에서 원하는 고양이를 고릅니다.
+
+          ## 참고
+
+          - 앱이 업데이트를 권해도 받지 마세요. 공식 버전으로 바뀌면서 고양이가 사라집니다.
+          - 원본은 [rullerzhou-afk/clawd-on-desk](https://github.com/rullerzhou-afk/clawd-on-desk)이고 라이선스는 AGPL-3.0입니다. 이 빌드의 소스는 이 저장소의 `cat-accessories` 브랜치입니다.
+          EOF
+          gh release create "cat-mac-${{ github.run_number }}" dist/*.dmg \
+            --target "$GITHUB_SHA" \
+            --title "Clawd on Desk + 고양이 (macOS)" \
+            --notes-file notes.md

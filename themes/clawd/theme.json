@@ -625,6 +625,82 @@
         }
       },
       "itemOverrides": {
+        "cat": {
+          "files": {
+            "clawd-error.svg": {
+              "staticFrame": {
+                "cx": 7.5,
+                "baseY": 10.5,
+                "width": 16
+              },
+              "hitBoxPadding": {
+                "left": 1,
+                "top": 1,
+                "right": 1,
+                "bottom": 2
+              },
+              "followTarget": {
+                "id": "accessory-anchor",
+                "frame": {
+                  "cx": 7.5,
+                  "baseY": 10.5,
+                  "width": 16
+                }
+              }
+            },
+            "clawd-wake.svg": {
+              "staticFrame": {
+                "cx": 7.5,
+                "baseY": 6.5,
+                "width": 16
+              },
+              "hitBoxPadding": {
+                "left": 2,
+                "top": 8,
+                "right": 2,
+                "bottom": 4.3
+              },
+              "followTarget": {
+                "id": "accessory-anchor",
+                "frame": {
+                  "cx": 7.5,
+                  "baseY": 6.5,
+                  "width": 16
+                }
+              }
+            },
+            "clawd-headphones-groove.svg": {
+              "staticFrame": {
+                "cx": 7.5,
+                "baseY": 6.5,
+                "width": 16
+              },
+              "followTarget": {
+                "id": "accessory-anchor",
+                "frame": {
+                  "cx": 7.5,
+                  "baseY": 6.5,
+                  "width": 16
+                }
+              }
+            },
+            "clawd-mini-sleep.svg": {
+              "staticFrame": {
+                "cx": 5.733,
+                "baseY": 6.686,
+                "width": 16
+              },
+              "followTarget": {
+                "id": "body-js",
+                "frame": {
+                  "cx": 7.5,
+                  "baseY": 6.5,
+                  "width": 16
+                }
+              }
+            }
+          }
+        },
         "western-cowboy-hat": {
           "files": {
             "clawd-collapse-sleep.svg": {

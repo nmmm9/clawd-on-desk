@@ -46,6 +46,10 @@ const PET_ACCESSORY_CATALOG = Object.freeze([
   freezeAccessory({ id: "santa-hat", labelKey: "accessorySantaHat", file: "santa-hat.svg", viewBox: { x: 0, y: 0, width: 16, height: 9 }, offsetY: 0.2 }),
   freezeAccessory({ id: "pumpkin-hat", labelKey: "accessoryPumpkinHat", file: "pumpkin-hat.svg", viewBox: { x: 0, y: 0, width: 13, height: 9 }, widthScale: 0.85, offsetY: 0.4 }),
   freezeAccessory({ id: "halo", labelKey: "accessoryHalo", file: "halo.svg", viewBox: { x: 0, y: 0, width: 14, height: 5 }, widthScale: 1.15, offsetY: -1.4, themeWidthScales: { clawd: 0.9 } }),
+  // Local: calico cat lying on the head. Canvas is symmetric about the head centre so the renderer can keep it facing.
+  freezeAccessory({ id: "cat", labelKey: "accessoryCat", file: "cat.svg", viewBox: { x: -1.5, y: -1, width: 18, height: 8 }, widthScale: 1.125, offsetY: 0.5 }),
+  // Local: coat variants of the cat (same shapes). Their per-file overrides are shared with "cat" in pet-accessory-descriptor.js.
+  ...["Black", "White", "Tuxedo", "Cheese"].map((coat) => freezeAccessory({ id: `cat-${coat.toLowerCase()}`, labelKey: `accessoryCat${coat}`, file: `cat-${coat.toLowerCase()}.svg`, viewBox: { x: -1.5, y: -1, width: 18, height: 8 }, widthScale: 1.125, offsetY: 0.5 })),
 ]);
 
 const PET_ACCESSORY_BY_ID = new Map(PET_ACCESSORY_CATALOG.map((entry) => [entry.id, entry]));

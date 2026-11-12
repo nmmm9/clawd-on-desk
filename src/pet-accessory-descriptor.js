@@ -17,13 +17,15 @@
     if (typeof itemId !== "string" || !SAFE_ITEM_ID.test(itemId)) return null;
     if (typeof file !== "string" || !SAFE_BASENAME.test(file)) return null;
 
+    // Local: cat coat variants (cat-black, …) reuse the calico cat's per-file overrides.
+    const overrideId = itemId.startsWith("cat-") ? "cat" : itemId;
     if (
       attachments.itemOverrides
-      && attachments.itemOverrides[itemId]
-      && attachments.itemOverrides[itemId].files
-      && Object.prototype.hasOwnProperty.call(attachments.itemOverrides[itemId].files, file)
+      && attachments.itemOverrides[overrideId]
+      && attachments.itemOverrides[overrideId].files
+      && Object.prototype.hasOwnProperty.call(attachments.itemOverrides[overrideId].files, file)
     ) {
-      return attachments.itemOverrides[itemId].files[file] || null;
+      return attachments.itemOverrides[overrideId].files[file] || null;
     }
 
     if (
